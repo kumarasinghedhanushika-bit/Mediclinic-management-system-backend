@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: clinic
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: chavidairy@gmail.com
+    password: djpfdkotsgajotfj
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+
+  data:
+    mongodb:
+      uri: mongodb+srv://kumarasinghe:jCHo3TnZLljLu9B1@cluster0.virnamq.mongodb.net/hospitalsystem?retryWrites=true&w=majority&appName=Cluster0
+
+server:
+  port: 8080
+
+cloudinary:
+  cloud-name: dhrk3pu07
+  api-key: 315928574915832
+  api-secret: ojRT85fT_XXTaPmjpPCfOBJ9IbQ
+  max-image-mb: 5
+  max-pdf-mb: 10
+
+payhere:
+  sandbox: true
+  merchant-id: ${PAYHERE_MERCHANT_ID:1236113}
+  merchant-secret: ${PAYHERE_MERCHANT_SECRET:MTYwMzgwMjYwMDI1NjQ1NTg2MjIzODUzMzA3OTk2MTYwNzIzOTQ3}
+  currency: LKR
+  return-url: http://localhost:4200/payment/success
+  cancel-url: http://localhost:4200/payment/cancel
+  notify-url: http://localhost:8080/api/payments/payhere/notify
+
+jwt:
+  secret: "mySuperSecureJwtSecretKeyForMedicalClinicProject2026VeryLongSecretKey123456789"
+  expiration: 3600000
+  refresh-expiration: 604800000
+
+app:
+  frontend-url: http://localhost:5173
+  base-url: http://localhost:8080
+  reminder:
+    cron: "0 */5 * * * *"
