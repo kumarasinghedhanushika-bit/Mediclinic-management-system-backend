@@ -412,6 +412,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void sendVerificationEmail(User user, String token) {
+        System.out.println("frontend url"+frontendUrl);
         String link = frontendUrl +
                 "/verify-email?token=" + token;
         emailService.sendEmail(
