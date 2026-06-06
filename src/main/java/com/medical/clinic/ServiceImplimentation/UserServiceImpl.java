@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse register(RegisterRequest request,
-                                 boolean staffRegistration) {
+                        boolean staffRegistration) {
 
         if (userRepository.existsByEmail(
                 request.getEmail().trim().toLowerCase())) {
