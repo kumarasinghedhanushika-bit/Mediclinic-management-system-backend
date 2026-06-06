@@ -12,6 +12,7 @@
       <env name="PAYHERE_MERCHANT_ID" value="1236113" />
       <env name="PAYHERE_MERCHANT_SECRET" value="MTYwMzgwMjYwMDI1NjQ1NTg2MjIzODUzMzA3OTk2MTYwNzIzOTQ3" />
       <env name="USER_EMAIL" value="chavidairy@gmail.com" />
+      <env name="RESEND_API_KEY" value="re_WEoC6VaH_8NjdrBYcb2eifJiM4Bx3pEpx" />
     </envs>
     <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
     <option name="INCLUDE_PROVIDED_SCOPE" value="false" />

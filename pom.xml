@@ -64,6 +64,12 @@
 	</dependency>
 
 	<dependency>
+		<groupId>com.resend</groupId>
+		<artifactId>resend-java</artifactId>
+		<version>3.1.0</version>
+	</dependency>
+
+	<dependency>
 		<groupId>io.jsonwebtoken</groupId>
 		<artifactId>jjwt-impl</artifactId>
 		<version>${jjwt.version}</version>
