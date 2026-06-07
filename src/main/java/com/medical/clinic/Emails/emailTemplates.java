@@ -102,7 +102,7 @@ public class emailTemplates {
     // ================= SEAL ICON (checkmark) =================
     private static String sealIcon(String svgPath, String pathColor) {
         return """
-                <div style="width:62px; height:62px; border-radius:50%; background:%s;
+                <div style="width:62px; height:62px; border-radius:50%%; background:%s;
                             margin:0 auto 20px; display:flex; align-items:center;
                             justify-content:center; line-height:62px; text-align:center;">
                     <svg width="28" height="28" viewBox="0 0 30 30"
@@ -124,19 +124,17 @@ public class emailTemplates {
     }
 
     // ================= TABLE ROW =================
+    // NOTE: Returns a plain string (no .formatted call), so % in CSS is safe as-is.
+    // The width:38% is written as a literal — callers that embed this via %s in their
+    // own .formatted() would choke on it, so we pre-build the row without .formatted().
     private static String tableRow(String label, String value, boolean last) {
         String border = last ? "" : "border-bottom:1px solid rgba(200,175,120,0.2);";
-        return """
-                <tr>
-                    <td style="padding:10px 14px; font-family:%s; font-size:13px;
-                               color:%s; font-weight:400; %s width:38%%;">%s</td>
-                    <td style="padding:10px 14px; font-family:%s; font-size:13px;
-                               color:%s; font-weight:600; %s">%s</td>
-                </tr>
-                """.formatted(
-                SANS_FONT, TEXT_MID, border, label,
-                SANS_FONT, TEXT_DARK, border, value
-        );
+        return "<tr>"
+                + "<td style=\"padding:10px 14px; font-family:" + SANS_FONT + "; font-size:13px;"
+                + " color:" + TEXT_MID + "; font-weight:400; " + border + " width:38%;\">" + label + "</td>"
+                + "<td style=\"padding:10px 14px; font-family:" + SANS_FONT + "; font-size:13px;"
+                + " color:" + TEXT_DARK + "; font-weight:600; " + border + "\">" + value + "</td>"
+                + "</tr>";
     }
 
     // ================= BUTTON =================
@@ -173,7 +171,7 @@ public class emailTemplates {
     // ================= OTP EMAIL ========================
     // ====================================================
     public static String otpEmail(String name, String otp) {
-        String svgPath = "<path d=\"M10 15.5l3.5 3.5 7-7\" stroke=\"%s\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/>".formatted(GOLD);
+        String svgPath = "<path d=\"M10 15.5l3.5 3.5 7-7\" stroke=\"" + GOLD + "\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/>";
         return wrapperOpen() + header() + accentLine() + """
                 <div style="padding:36px 52px 32px; text-align:center;">
                     %s
@@ -223,7 +221,7 @@ public class emailTemplates {
     // ================= WELCOME EMAIL ====================
     // ====================================================
     public static String welcomeEmail(String name, String url) {
-        String svgPath = "<path d=\"M10 15.5l3.5 3.5 7-7\" stroke=\"%s\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/>".formatted(GOLD);
+        String svgPath = "<path d=\"M10 15.5l3.5 3.5 7-7\" stroke=\"" + GOLD + "\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/>";
         return wrapperOpen() + header() + accentLine() + """
                 <div style="padding:36px 52px 32px; text-align:center;">
                     %s
@@ -271,9 +269,18 @@ public class emailTemplates {
             String status,
             Double fee
     ) {
-        String svgPath = "<path d=\"M9 15l4 4 8-8\" stroke=\"%s\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/>".formatted(GOLD);
+        String svgPath = "<path d=\"M9 15l4 4 8-8\" stroke=\"" + GOLD + "\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/>";
         String feeStr = (fee != null) ? String.format("LKR %.2f", fee) : "N/A";
         String dept   = (departmentName != null) ? departmentName : "General";
+
+        // Build table rows first (plain string concatenation — no % format tokens)
+        String rows = tableRow("Reference No.", appointmentNumber, false)
+                + tableRow("Doctor", "Dr. " + doctorName, false)
+                + tableRow("Department", dept, false)
+                + tableRow("Date", date, false)
+                + tableRow("Time", time, false)
+                + tableRow("Status", status, false)
+                + tableRow("Consultation Fee", feeStr, true);
 
         return wrapperOpen() + header() + accentLine() + """
                 <div style="padding:36px 48px 28px; text-align:center;">
@@ -299,7 +306,7 @@ public class emailTemplates {
                             </tr>
                         </thead>
                         <tbody>
-                            %s %s %s %s %s %s %s
+                            %s
                         </tbody>
                     </table>
                     <p style="font-family:%s; font-size:12px; color:%s; margin-top:20px;
@@ -315,13 +322,7 @@ public class emailTemplates {
                 BASE_FONT, GREEN_DARK,
                 BASE_FONT, TEXT_MID, GREEN_DARK, patientName,
                 GREEN_DARK, SANS_FONT, GOLD,
-                tableRow("Reference No.", appointmentNumber, false),
-                tableRow("Doctor", "Dr. " + doctorName, false),
-                tableRow("Department", dept, false),
-                tableRow("Date", date, false),
-                tableRow("Time", time, false),
-                tableRow("Status", status, false),
-                tableRow("Consultation Fee", feeStr, true),
+                rows,
                 SANS_FONT, TEXT_MUTED,
                 divider()
         ) + footer() + WRAPPER_CLOSE;
@@ -337,7 +338,7 @@ public class emailTemplates {
             String date,
             String time
     ) {
-        String svgPath = "<path d=\"M15 9v6m0 3h.01\" stroke=\"%s\" stroke-width=\"1.5\" stroke-linecap=\"round\" fill=\"none\"/>".formatted(GOLD);
+        String svgPath = "<path d=\"M15 9v6m0 3h.01\" stroke=\"" + GOLD + "\" stroke-width=\"1.5\" stroke-linecap=\"round\" fill=\"none\"/>";
 
         return wrapperOpen() + header() + accentLine() + """
                 <div style="padding:36px 52px 32px; text-align:center;">
@@ -393,7 +394,7 @@ public class emailTemplates {
             String date,
             String time
     ) {
-        String svgPath = "<path d=\"M11 11l8 8M19 11l-8 8\" stroke=\"%s\" stroke-width=\"1.5\" stroke-linecap=\"round\" fill=\"none\"/>".formatted(GOLD);
+        String svgPath = "<path d=\"M11 11l8 8M19 11l-8 8\" stroke=\"" + GOLD + "\" stroke-width=\"1.5\" stroke-linecap=\"round\" fill=\"none\"/>";
 
         return wrapperOpen() + header() + accentLine() + """
                 <div style="padding:36px 52px 32px; text-align:center;">
@@ -437,7 +438,7 @@ public class emailTemplates {
             String date,
             String time
     ) {
-        String svgPath = "<path d=\"M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5M16.5 3L21 7.5m0 0L16.5 12M21 7.5H7.5\" stroke=\"%s\" stroke-width=\"1.3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/>".formatted(GOLD);
+        String svgPath = "<path d=\"M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5M16.5 3L21 7.5m0 0L16.5 12M21 7.5H7.5\" stroke=\"" + GOLD + "\" stroke-width=\"1.3\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/>";
 
         return wrapperOpen() + header() + accentLine() + """
                 <div style="padding:36px 52px 32px; text-align:center;">
@@ -494,7 +495,11 @@ public class emailTemplates {
             String verificationUrl,
             String resetPasswordUrl
     ) {
-        String svgPath = "<path d=\"M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z\" fill=\"%s\" opacity=\"0.85\"/>".formatted(GOLD);
+        String svgPath = "<path d=\"M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z\" fill=\"" + GOLD + "\" opacity=\"0.85\"/>";
+
+        // Build rows without format tokens to avoid stray-% issues
+        String rows = tableRow("Login Email", email, false)
+                + tableRow("Temporary Password", temporaryPassword, true);
 
         return wrapperOpen() + header() + accentLine() + """
                 <div style="padding:36px 52px 28px; text-align:center;">
@@ -523,7 +528,7 @@ public class emailTemplates {
                             </tr>
                         </thead>
                         <tbody>
-                            %s %s
+                            %s
                         </tbody>
                     </table>
                     <p style="font-family:%s; font-size:13px; color:%s; text-align:center;
@@ -548,8 +553,7 @@ public class emailTemplates {
                 BASE_FONT, TEXT_MID, GREEN_DARK, name,
                 SANS_FONT, TEXT_MUTED, GREEN_DARK,
                 GREEN_DARK, SANS_FONT, GOLD,
-                tableRow("Login Email", email, false),
-                tableRow("Temporary Password", temporaryPassword, true),
+                rows,
                 SANS_FONT, TEXT_MID,
                 ctaButton(verificationUrl, "Verify Email", GREEN_DARK, GOLD_LIGHT),
                 ctaButton(resetPasswordUrl, "Reset Password", CREAM, GREEN_DARK),
@@ -562,7 +566,11 @@ public class emailTemplates {
     // ========= WALK-IN WELCOME EMAIL ====================
     // ====================================================
     public static String walkInWelcomeEmail(String name, String email) {
-        String svgPath = "<path d=\"M10 15.5l3.5 3.5 7-7\" stroke=\"%s\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/>".formatted(GOLD);
+        String svgPath = "<path d=\"M10 15.5l3.5 3.5 7-7\" stroke=\"" + GOLD + "\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" fill=\"none\"/>";
+
+        // Build rows without format tokens
+        String rows = tableRow("Email", email, false)
+                + tableRow("Status", "Active &mdash; No verification required", true);
 
         return wrapperOpen() + header() + accentLine() + """
                 <div style="padding:36px 52px 32px; text-align:center;">
@@ -588,7 +596,7 @@ public class emailTemplates {
                             </tr>
                         </thead>
                         <tbody>
-                            %s %s
+                            %s
                         </tbody>
                     </table>
                     <div style="text-align:center; margin-bottom:20px;">
@@ -605,8 +613,7 @@ public class emailTemplates {
                 BASE_FONT, GREEN_DARK, name,
                 BASE_FONT, TEXT_MID, GREEN_DARK,
                 GREEN_DARK, SANS_FONT, GOLD,
-                tableRow("Email", email, false),
-                tableRow("Status", "Active &mdash; No verification required", true),
+                rows,
                 ctaButton("http://localhost:5173/login", "Login to Your Account", GREEN_DARK, GOLD_LIGHT),
                 SANS_FONT, TEXT_MUTED,
                 divider()
