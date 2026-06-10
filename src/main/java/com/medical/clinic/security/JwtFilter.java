@@ -39,6 +39,8 @@ public class JwtFilter extends OncePerRequestFilter {
             // ❗ CRITICAL FIX: skip auth endpoints
             if (path.startsWith("/api/auth/")
                     || path.startsWith("/api/public/")
+                    || path.startsWith("/oauth2/")
+                    || path.startsWith("/login/oauth2/")
                     || path.equals("/api/payments/payhere/notify")) {
                 filterChain.doFilter(request, response);
                 return;

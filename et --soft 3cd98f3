@@ -1,0 +1,19 @@
+[33mc06a0a9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Clean secrets
+[33mcdcda39[m feat: Implement OAuth2 authentication flow with Google integration; update environment configurations and security settings
+[33m3cd98f3[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m feat: Add initial implementations of OAuth2 user classes for authentication handling
+[33m6b41688[m Refactor code structure for improved readability and maintainability
+[33m5f641f8[m feat: Update RESEND_API_KEY in run configuration and change email sender address in EmailServiceImpl
+[33mcd50a9a[m feat: Update CORS configuration to allow additional origins for enhanced accessibility
+[33md208904[m Refactor email templates for improved styling and structure; add new email types for appointment notifications and staff onboarding; enhance existing email formats with shared styles and reusable components.
+[33m9ce60ad[m feat: Add RESEND_API_KEY to environment configuration
+[33maac530e[m feat: Integrate Resend API for email sending and update configuration
+[33m4f1d7c3[m fix: Update FRONTEND_URL and remove duplicate MONGO_URI entry in run configuration
+[33md526fb4[m feat: Add logging for frontend URL in sendVerificationEmail method
+[33m7c9cf43[m fix: Update CORS configuration to allow specific origins
+[33me129d4d[m feat: Add environment variables and update configuration for Cloudinary and Payhere integration
+[33me5f81da[m feat: Add Qodana configuration and environment variables for clinic application
+[33md5f19c4[m Merge branch 'main' of https://github.com/kumarasinghedhanushika-bit/Mediclinic-management-system-backend
+[33m6be0262[m feat: Add initial Docker configuration files
+[33mfb9968b[m Create main.yml
+[33m8449064[m feat: Implement repository and service layers for clinic management
+[33m5a2f3e6[m first commit

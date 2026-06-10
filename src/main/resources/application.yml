@@ -2,11 +2,22 @@ spring:
   application:
     name: clinic
 
-
-
   data:
     mongodb:
       uri: ${MONGO_URI}
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
+            # Must match SecurityConfig redirectionEndpoint baseUri
+            redirect-uri: "{baseUrl}/api/auth/oauth2/callback/{registrationId}"
 
 server:
   port: 8080
@@ -25,7 +36,7 @@ payhere:
   currency: LKR
   return-url: ${FRONTEND_URL}/payment/success
   cancel-url: ${FRONTEND_URL}/payment/cancel
-  notify-url: ${BACKEND_URL}in/api/payments/payhere/notify
+  notify-url: ${BACKEND_URL}/api/payments/payhere/notify
 
 jwt:
   secret: ${JWT_SECRET}
@@ -35,6 +46,11 @@ jwt:
 app:
   frontend-url: ${FRONTEND_URL}
   base-url: ${BACKEND_URL}
+
+  oauth2:
+    # Spring's SuccessHandler/FailureHandler will redirect here
+    redirect-uri: http://localhost:5173/oauth2/callback
+
   reminder:
     cron: "0 */5 * * * *"
 
