@@ -37,6 +37,7 @@ public class BillController {
     @GetMapping("/patient/{patientId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'RECEPTIONIST', 'PATIENT')")
     public ResponseEntity<ApiResponse<List<Bill>>> byPatient(@PathVariable String patientId) {
+        System.out.println("mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm");
         return ResponseEntity.ok(new ApiResponse<>("Bills fetched", false, true, billService.getBillsByPatientId(patientId)));
     }
 

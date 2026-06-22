@@ -2,6 +2,7 @@ package com.medical.clinic.ServiceImplimentation;
 
 import com.medical.clinic.enums.PaymentStatus;
 import com.medical.clinic.model.Bill;
+import com.medical.clinic.model.Patient;
 import com.medical.clinic.repository.BillRepository;
 import com.medical.clinic.service.BillService;
 import org.springframework.stereotype.Service;
@@ -47,6 +48,7 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public Bill getBillById(String id) {
+        System.out.println("billing id" +id);
         return billRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Bill not found"));
     }
@@ -58,6 +60,7 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public List<Bill> getBillsByPatientId(String patientId) {
+
         return billRepository.findByPatientId(patientId);
     }
 

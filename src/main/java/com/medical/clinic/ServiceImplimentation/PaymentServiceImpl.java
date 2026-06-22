@@ -44,7 +44,9 @@ public class PaymentServiceImpl implements PaymentService {
         User user = userRepository.findByEmail(patientEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Appointment appointment = appointmentRepository.findById(request.getAppointmentId())
+        System.out.println("Appointment ID Received = " + request.getAppointmentId());
+
+        Appointment appointment = appointmentRepository.findByAppointmentNumber(request.getAppointmentId())
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
         if (!appointment.getPatientUserId().equals(user.getId())) {
