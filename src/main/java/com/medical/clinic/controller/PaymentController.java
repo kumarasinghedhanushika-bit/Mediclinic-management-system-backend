@@ -36,6 +36,7 @@ public class PaymentController {
     public ResponseEntity<ApiResponse<PayHereCheckoutResponse>> checkout(
             @Valid @RequestBody PayHereCheckoutRequest request
     ) {
+
         PayHereCheckoutResponse response = paymentService.initiateCheckout(
                 request,
                 SecurityUtils.currentUserEmail()

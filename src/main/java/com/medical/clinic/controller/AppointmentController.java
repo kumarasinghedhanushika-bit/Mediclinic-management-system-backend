@@ -1,7 +1,9 @@
 package com.medical.clinic.controller;
 
 import com.medical.clinic.dto.appointment.*;
+import com.medical.clinic.mapper.AppointmentMapper;
 import com.medical.clinic.model.ApiResponse;
+import com.medical.clinic.model.Appointment;
 import com.medical.clinic.security.SecurityUtils;
 import com.medical.clinic.service.AppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,9 +22,11 @@ import java.util.List;
 public class AppointmentController {
 
     private final AppointmentService appointmentService;
+    private final AppointmentMapper appointmentMapper;
 
-    public AppointmentController(AppointmentService appointmentService) {
+    public AppointmentController(AppointmentService appointmentService, AppointmentMapper appointmentMapper) {
         this.appointmentService = appointmentService;
+        this.appointmentMapper = appointmentMapper;
     }
 
     @PostMapping("/book")
@@ -170,6 +174,18 @@ public class AppointmentController {
                 false,
                 true,
                 appointmentService.getAppointmentsByPatientId(patientId)
+        ));
+    }
+
+    @GetMapping("/number/{appointmentNumber}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get appointment by appointment number")
+    public ResponseEntity<ApiResponse<Appointment>> getByAppointmentNumber(@PathVariable String appointmentNumber) {
+        return ResponseEntity.ok(new ApiResponse<>(
+                "Appointment fetched",
+                false,
+                true,
+                appointmentService.getEntityByAppointmentNumber(appointmentNumber)
         ));
     }
 

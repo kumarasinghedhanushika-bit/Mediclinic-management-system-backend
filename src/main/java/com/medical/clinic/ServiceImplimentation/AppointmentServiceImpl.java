@@ -70,6 +70,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new RuntimeException("Only patients can book appointments online");
         }
         Patient patient = patientService.getOrCreateForUser(user);
+        System.out.println("Booking appointment for patient: " + patient);
         return createAndSave(
                 patient,
                 request.getDoctorId(),
@@ -101,8 +102,9 @@ public class AppointmentServiceImpl implements AppointmentService {
                 actor.getRole().name(),
                 AppointmentStatus.CONFIRMED
         );
-
+        System.out.println(response);
         return response;
+
     }
 
     @Override
@@ -232,6 +234,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public AppointmentResponse getAppointmentById(String id) {
+        System.out.println("Fetching appointment with ID: " + id);
         return appointmentMapper.toResponse(getEntity(id));
     }
 
@@ -382,6 +385,12 @@ public class AppointmentServiceImpl implements AppointmentService {
     private Appointment getEntity(String id) {
         return appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
+    }
+
+    @Override
+    public Appointment getEntityByAppointmentNumber(String appointmentNumber) {
+        return appointmentRepository.findByAppointmentNumber(appointmentNumber)
+                .orElseThrow(() -> new RuntimeException("Appointment not found by appointment number"));
     }
 
     private void validateDateTime(LocalDate date, LocalTime time) {

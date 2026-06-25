@@ -98,6 +98,91 @@ public class emailTemplates {
                 """.formatted(GRAY_200);
     }
 
+    // ====================================================
+// ============ PAYHERE PAYMENT EMAIL ================
+// ====================================================
+
+    public static String payherePaymentEmail(
+            String patientName,
+            String orderId,
+            String amount,
+            String currency,
+            String status,
+            String message
+    ) {
+
+        String color;
+        String title;
+        String icon;
+
+        switch (status) {
+            case "2" -> { // SUCCESS
+                color = "#16a34a";
+                title = "Payment Successful";
+                icon = "✔";
+            }
+            case "0" -> { // PENDING
+                color = "#f59e0b";
+                title = "Payment Pending";
+                icon = "⏳";
+            }
+            case "-1" -> { // CANCELLED
+                color = "#dc2626";
+                title = "Payment Cancelled";
+                icon = "✖";
+            }
+            case "-2" -> { // FAILED
+                color = "#b91c1c";
+                title = "Payment Failed";
+                icon = "⚠";
+            }
+            default -> {
+                color = "#64748b";
+                title = "Payment Status Update";
+                icon = "ℹ";
+            }
+        }
+
+        return wrapperOpen() + header() + accentLine() + """
+        <div style="padding:40px 48px; text-align:center;">
+
+            <div style="font-size:50px; color:%s; margin-bottom:10px;">%s</div>
+
+            <div style="font-family:%s; font-size:26px; font-weight:700; color:%s;">
+                %s
+            </div>
+
+            <p style="font-family:%s; font-size:15px; color:%s; margin-top:10px;">
+                Hello <strong>%s</strong>, your payment update is below.
+            </p>
+        </div>
+
+        <div style="padding:0 48px 30px;">
+            <table style="width:100%%; border-collapse:collapse; border:1px solid %s;">
+                <tbody>
+                    %s
+                    %s
+                    %s
+                    %s
+                    %s
+                </tbody>
+            </table>
+        </div>
+    """.formatted(
+                color, icon,
+                BASE_FONT, color, title,
+                BASE_FONT, GRAY_700,
+                patientName,
+                GRAY_200,
+
+                tableRow("Order ID", orderId, false),
+                tableRow("Amount", amount + " " + currency, false),
+                tableRow("Status Code", status, false),
+                tableRow("Message", message != null ? message : "N/A", false),
+                tableRow("Payment Status", title, true)
+        ) + footer() + WRAPPER_CLOSE;
+    }
+
     // ================= ICON CIRCLE =================
     private static String sealIcon(String svgPath, String pathColor) {
         return """

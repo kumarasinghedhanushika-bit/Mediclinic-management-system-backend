@@ -5,7 +5,9 @@ import com.medical.clinic.dto.pharmacy.PharmacyMedicineResponse;
 import com.medical.clinic.mapper.PharmacyMedicineMapper;
 import com.medical.clinic.model.PharmacyMedicine;
 import com.medical.clinic.repository.PharmacyMedicineRepository;
+import com.medical.clinic.service.EmailServise;
 import com.medical.clinic.service.PharmacyService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,6 +20,9 @@ public class PharmacyServiceImpl implements PharmacyService {
 
     private final PharmacyMedicineRepository repository;
     private final PharmacyMedicineMapper mapper;
+
+    @Autowired
+    private EmailServise emailServise;
 
     public PharmacyServiceImpl(PharmacyMedicineRepository repository, PharmacyMedicineMapper mapper) {
         this.repository = repository;
