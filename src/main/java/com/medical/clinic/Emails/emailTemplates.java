@@ -159,7 +159,11 @@ public class emailTemplates {
         </div>
 
         <div style="padding:0 48px 30px;">
+<<<<<<< HEAD
             <table style="width:100%%; border-collapse:separate; border-spacing:0; border:1px solid %s; border-radius:10px; overflow:hidden;">
+=======
+            <table style="width:100%%; border-collapse:collapse; border:1px solid %s;">
+>>>>>>> a789e81295aa029a099b3c63df8eec257aff8de7
                 <tbody>
                     %s
                     %s

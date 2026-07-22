@@ -84,6 +84,9 @@ public class AppointmentServiceImpl implements AppointmentService {
         );
     }
 
+
+    
+
     @Override
     public AppointmentResponse createAppointment(AppointmentCreateRequest request, String bookedByEmail) {
         User actor = userRepository.findByEmail(bookedByEmail)
