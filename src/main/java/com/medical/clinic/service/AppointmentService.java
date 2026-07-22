@@ -2,6 +2,7 @@ package com.medical.clinic.service;
 
 import com.medical.clinic.dto.appointment.*;
 import com.medical.clinic.enums.AppointmentStatus;
+import com.medical.clinic.model.Appointment;
 
 import java.util.List;
 
@@ -33,5 +34,6 @@ public interface AppointmentService {
 
     List<AppointmentResponse> getAppointmentsByDoctorId(String doctorId);
 
+    Appointment getEntityByAppointmentNumber(String appointmentNumber);
     void sendUpcomingReminders();
 }

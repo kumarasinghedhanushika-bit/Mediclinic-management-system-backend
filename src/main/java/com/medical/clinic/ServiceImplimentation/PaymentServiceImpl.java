@@ -1,17 +1,22 @@
 package com.medical.clinic.ServiceImplimentation;
 
+import com.medical.clinic.Emails.emailTemplates;
 import com.medical.clinic.config.PayHereProperties;
 import com.medical.clinic.dto.payment.PayHereCheckoutRequest;
 import com.medical.clinic.dto.payment.PayHereCheckoutResponse;
 import com.medical.clinic.enums.PaymentStatus;
 import com.medical.clinic.model.Appointment;
 import com.medical.clinic.model.Bill;
+import com.medical.clinic.model.Patient;
 import com.medical.clinic.model.User;
 import com.medical.clinic.repository.AppointmentRepository;
 import com.medical.clinic.repository.BillRepository;
+import com.medical.clinic.repository.PatientRepository;
 import com.medical.clinic.repository.UserRepository;
+import com.medical.clinic.service.EmailServise;
 import com.medical.clinic.service.PaymentService;
 import com.medical.clinic.util.PayHereHashUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.DecimalFormat;
@@ -26,17 +31,21 @@ public class PaymentServiceImpl implements PaymentService {
     private final BillRepository billRepository;
     private final AppointmentRepository appointmentRepository;
     private final UserRepository userRepository;
+    private final PatientRepository patientRepository;
+    @Autowired
+    private EmailServise emailServise;
 
     public PaymentServiceImpl(
             PayHereProperties payHereProperties,
             BillRepository billRepository,
             AppointmentRepository appointmentRepository,
-            UserRepository userRepository
+            UserRepository userRepository, PatientRepository patientRepository
     ) {
         this.payHereProperties = payHereProperties;
         this.billRepository = billRepository;
         this.appointmentRepository = appointmentRepository;
         this.userRepository = userRepository;
+        this.patientRepository = patientRepository;
     }
 
     @Override
@@ -44,7 +53,6 @@ public class PaymentServiceImpl implements PaymentService {
         User user = userRepository.findByEmail(patientEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        System.out.println("Appointment ID Received = " + request.getAppointmentId());
 
         Appointment appointment = appointmentRepository.findByAppointmentNumber(request.getAppointmentId())
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
@@ -114,6 +122,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public void handlePayHereNotify(Map<String, String> params) {
+
         String merchantId = params.get("merchant_id");
         String orderId = params.get("order_id");
         String payhereAmount = params.get("payhere_amount");
@@ -149,6 +158,20 @@ public class PaymentServiceImpl implements PaymentService {
         bill.setPayhereStatusCode(statusCode);
         bill.setPayhereStatusMessage(params.get("status_message"));
 
+        Patient patient = patientRepository.findById(bill.getPatientId())
+                .orElseThrow(() -> new RuntimeException("Patient not found"));
+
+        User user = userRepository.findById(patient.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found for patient"));
+        String email = user.getEmail();
+        String statusText = switch (statusCode) {
+            case "2" -> "SUCCESS";
+            case "0" -> "PENDING";
+            case "-1" -> "CANCELLED";
+            case "-2" -> "FAILED";
+            default -> "UNKNOWN";
+        };
+
         if ("2".equals(statusCode)) {
             bill.setPaymentStatus(PaymentStatus.PAID);
             bill.setPaidAt(LocalDateTime.now());
@@ -157,8 +180,21 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         billRepository.save(bill);
-    }
 
+        // ================= EMAIL SEND =================
+        emailServise.sendEmail(
+                email,
+                "Payment Update - Order " + orderId,
+                emailTemplates.payherePaymentEmail(
+                        user.getFirstName(),
+                        orderId,
+                        String.valueOf(amount),
+                        currency,
+                        statusCode,
+                        bill.getPayhereStatusMessage()
+                )
+        );
+    }
     @Override
     public Bill getBillByOrderId(String orderId) {
         return billRepository.findByOrderId(orderId)

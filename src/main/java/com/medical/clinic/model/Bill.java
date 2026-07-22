@@ -23,6 +23,13 @@ public class Bill {
     private String patientId;
     private String appointmentId;
 
+    // NEW: human-readable references, copied from the Appointment at creation time
+    private String appointmentNumber;
+    private String patientNumber;
+    private String patientName;
+
+    private Double consultationFee;
+    private Double hospitalCharge;
     private Double amount;
     private String currency;
     private String description;
@@ -33,6 +40,8 @@ public class Bill {
     private String payherePaymentId;
     private String payhereStatusCode;
     private String payhereStatusMessage;
+
+    private String billNumber;
 
     @CreatedDate
     private LocalDateTime createdAt;

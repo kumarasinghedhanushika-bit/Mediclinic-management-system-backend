@@ -18,7 +18,14 @@ public final class PayHereHashUtil {
     ) {
         String formattedAmount = new DecimalFormat("0.00").format(amount);
         String secretHash = md5(merchantSecret).toUpperCase();
-        return md5(merchantId + orderId + formattedAmount + currency + secretHash).toUpperCase();
+
+        String hash = md5(merchantId + orderId + formattedAmount + currency + secretHash).toUpperCase();
+
+        // TEMP DEBUG — remove after confirming
+        System.out.println("HASH INPUT: " + merchantId + orderId + formattedAmount + currency + secretHash);
+        System.out.println("FINAL HASH: " + hash);
+
+        return hash;
     }
 
     public static String generateNotifySignature(

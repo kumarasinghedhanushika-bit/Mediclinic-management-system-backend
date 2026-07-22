@@ -25,7 +25,7 @@ public class EmailServiceImpl implements EmailServise {
     public void sendEmail(String to, String subject, String htmlBody) {
         try {
             CreateEmailOptions params = CreateEmailOptions.builder()
-                    .from("Medical Center <noreply@krishanidhanushika.com>")
+                    .from("Medical Center <mediclinic@krishanidhanushika.com>")
                     .to(List.of(to))
                     .subject(subject)
                     .html(htmlBody)

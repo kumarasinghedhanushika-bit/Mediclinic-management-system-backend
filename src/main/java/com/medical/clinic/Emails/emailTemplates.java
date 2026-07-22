@@ -8,12 +8,13 @@ public class emailTemplates {
     private static final String BASE_FONT   = "'Segoe UI', 'Helvetica Neue', Arial, sans-serif";
     private static final String MONO_FONT   = "'Courier New', Courier, monospace";
 
-    private static final String TEAL        = "#0d9488";
-    private static final String TEAL_DARK   = "#0f766e";
-    private static final String TEAL_LIGHT  = "#ccfbf1";
-    private static final String TEAL_FAINT  = "#f0fdfa";
-    private static final String BLUE        = "#0ea5e9";
-    private static final String BLUE_LIGHT  = "#e0f2fe";
+    // ---- Modern Sky-Blue Theme Palette ----
+    private static final String TEAL        = "#0ea5e9"; // sky-500 (primary accent)
+    private static final String TEAL_DARK   = "#0284c7"; // sky-600
+    private static final String TEAL_LIGHT  = "#bae6fd"; // sky-200
+    private static final String TEAL_FAINT  = "#f0f9ff"; // sky-50
+    private static final String BLUE        = "#38bdf8"; // sky-400 (gradient partner)
+    private static final String BLUE_LIGHT  = "#e0f2fe"; // sky-100
     private static final String WHITE       = "#ffffff";
     private static final String GRAY_50     = "#f8fafc";
     private static final String GRAY_100    = "#f1f5f9";
@@ -30,12 +31,12 @@ public class emailTemplates {
                     <div style="padding:32px 48px 28px; text-align:center;">
                         <div style="display:inline-flex; align-items:center; gap:10px;
                                     justify-content:center; margin-bottom:6px;">
-                            <div style="width:36px; height:36px; background:%s;
-                                        border-radius:8px; display:inline-block;
-                                        line-height:36px; text-align:center;">
+                            <div style="width:38px; height:38px; background:linear-gradient(135deg,%s,%s);
+                                        border-radius:12px; display:inline-block;
+                                        line-height:38px; text-align:center; box-shadow:0 4px 10px rgba(14,165,233,0.28);">
                                 <svg width="20" height="20" viewBox="0 0 24 24"
                                      xmlns="http://www.w3.org/2000/svg"
-                                     style="vertical-align:middle; margin-top:-2px;">
+                                     style="vertical-align:middle; margin-top:-1px;">
                                     <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 3a1 1 0 0 1 1 1v3h3a1 1 0 0 1 0 2h-3v3a1 1 0 0 1-2 0v-3H8a1 1 0 0 1 0-2h3V7a1 1 0 0 1 1-1z"
                                           fill="%s"/>
                                 </svg>
@@ -58,8 +59,8 @@ public class emailTemplates {
                     </div>
                 </div>
                 """.formatted(
-                WHITE, TEAL,
-                TEAL, WHITE,
+                WHITE, TEAL_LIGHT,
+                TEAL, BLUE, WHITE,
                 BASE_FONT, GRAY_900,
                 BASE_FONT, GRAY_500,
                 TEAL_FAINT, BASE_FONT, TEAL_DARK
@@ -98,18 +99,104 @@ public class emailTemplates {
                 """.formatted(GRAY_200);
     }
 
+    // ====================================================
+// ============ PAYHERE PAYMENT EMAIL ================
+// ====================================================
+
+    public static String payherePaymentEmail(
+            String patientName,
+            String orderId,
+            String amount,
+            String currency,
+            String status,
+            String message
+    ) {
+
+        String color;
+        String title;
+        String icon;
+
+        switch (status) {
+            case "2" -> { // SUCCESS
+                color = "#16a34a";
+                title = "Payment Successful";
+                icon = "✔";
+            }
+            case "0" -> { // PENDING
+                color = "#f59e0b";
+                title = "Payment Pending";
+                icon = "⏳";
+            }
+            case "-1" -> { // CANCELLED
+                color = "#dc2626";
+                title = "Payment Cancelled";
+                icon = "✖";
+            }
+            case "-2" -> { // FAILED
+                color = "#b91c1c";
+                title = "Payment Failed";
+                icon = "⚠";
+            }
+            default -> {
+                color = "#64748b";
+                title = "Payment Status Update";
+                icon = "ℹ";
+            }
+        }
+
+        return wrapperOpen() + header() + accentLine() + """
+        <div style="padding:40px 48px; text-align:center;">
+
+            <div style="font-size:50px; color:%s; margin-bottom:10px;">%s</div>
+
+            <div style="font-family:%s; font-size:26px; font-weight:700; color:%s;">
+                %s
+            </div>
+
+            <p style="font-family:%s; font-size:15px; color:%s; margin-top:10px;">
+                Hello <strong>%s</strong>, your payment update is below.
+            </p>
+        </div>
+
+        <div style="padding:0 48px 30px;">
+            <table style="width:100%%; border-collapse:separate; border-spacing:0; border:1px solid %s; border-radius:10px; overflow:hidden;">
+                <tbody>
+                    %s
+                    %s
+                    %s
+                    %s
+                    %s
+                </tbody>
+            </table>
+        </div>
+    """.formatted(
+                color, icon,
+                BASE_FONT, color, title,
+                BASE_FONT, GRAY_700,
+                patientName,
+                GRAY_200,
+
+                tableRow("Order ID", orderId, false),
+                tableRow("Amount", amount + " " + currency, false),
+                tableRow("Status Code", status, false),
+                tableRow("Message", message != null ? message : "N/A", false),
+                tableRow("Payment Status", title, true)
+        ) + footer() + WRAPPER_CLOSE;
+    }
+
     // ================= ICON CIRCLE =================
     private static String sealIcon(String svgPath, String pathColor) {
         return """
-                <div style="width:64px; height:64px; border-radius:50%%; background:%s;
+                <div style="width:68px; height:68px; border-radius:50%%; background:linear-gradient(135deg,%s,%s);
                             margin:0 auto 20px; display:flex; align-items:center;
-                            justify-content:center; line-height:64px; text-align:center;">
+                            justify-content:center; line-height:68px; text-align:center;
+                            box-shadow:0 6px 16px rgba(14,165,233,0.18);">
                     <svg width="30" height="30" viewBox="0 0 30 30"
                          xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;">
                         %s
                     </svg>
                 </div>
-                """.formatted(TEAL_LIGHT, svgPath);
+                """.formatted(TEAL_FAINT, TEAL_LIGHT, svgPath);
     }
 
     // ================= LABEL BADGE =================
@@ -118,17 +205,17 @@ public class emailTemplates {
                 <div style="display:inline-block; background:%s; color:%s;
                             font-family:%s; font-size:11px; font-weight:600;
                             letter-spacing:0.06em; text-transform:uppercase;
-                            padding:4px 12px; border-radius:20px; margin-bottom:14px;">%s</div>
-                """.formatted(TEAL_LIGHT, TEAL_DARK, BASE_FONT, text);
+                            padding:5px 14px; border-radius:999px; margin-bottom:14px;">%s</div>
+                """.formatted(TEAL_FAINT, TEAL_DARK, BASE_FONT, text);
     }
 
     // ================= TABLE ROW =================
     private static String tableRow(String label, String value, boolean last) {
         String border = last ? "" : "border-bottom:1px solid " + GRAY_100 + ";";
         return "<tr>"
-                + "<td style=\"padding:11px 16px; font-family:" + BASE_FONT + "; font-size:13px;"
+                + "<td style=\"padding:12px 16px; font-family:" + BASE_FONT + "; font-size:13px;"
                 + " color:" + GRAY_500 + "; font-weight:400; background:" + GRAY_50 + "; " + border + " width:40%;\">" + label + "</td>"
-                + "<td style=\"padding:11px 16px; font-family:" + BASE_FONT + "; font-size:13px;"
+                + "<td style=\"padding:12px 16px; font-family:" + BASE_FONT + "; font-size:13px;"
                 + " color:" + GRAY_900 + "; font-weight:600; background:" + WHITE + "; " + border + "\">" + value + "</td>"
                 + "</tr>";
     }
@@ -136,10 +223,10 @@ public class emailTemplates {
     // ================= BUTTON =================
     private static String ctaButton(String href, String label, String bg, String textColor) {
         return """
-                <a href="%s" style="display:inline-block; padding:13px 32px;
+                <a href="%s" style="display:inline-block; padding:13px 34px;
                     background:%s; color:%s; text-decoration:none;
                     font-family:%s; font-size:13px; font-weight:600;
-                    letter-spacing:0.03em; border-radius:6px;">%s</a>
+                    letter-spacing:0.03em; border-radius:10px; box-shadow:0 4px 12px rgba(14,165,233,0.22);">%s</a>
                 """.formatted(href, bg, textColor, BASE_FONT, label);
     }
 
@@ -156,9 +243,9 @@ public class emailTemplates {
                 <head><meta charset="UTF-8"></head>
                 <body style="margin:0; padding:0; font-family:%s; background:%s;">
                 <div style="max-width:600px; margin:40px auto; background:%s;
-                            border-radius:10px; overflow:hidden;
-                            box-shadow:0 4px 24px rgba(0,0,0,0.08); border:1px solid %s;">
-                """.formatted(BASE_FONT, GRAY_100, WHITE, GRAY_200);
+                            border-radius:18px; overflow:hidden;
+                            box-shadow:0 8px 30px rgba(14,165,233,0.12); border:1px solid %s;">
+                """.formatted(BASE_FONT, TEAL_FAINT, WHITE, GRAY_200);
     }
 
     private static final String WRAPPER_CLOSE = "</div></body></html>";
@@ -184,7 +271,7 @@ public class emailTemplates {
                         This code is valid for a short time only.</p>
 
                     <div style="background:%s; border:2px solid %s;
-                                border-radius:10px; padding:20px 40px; margin:0 0 24px;
+                                border-radius:14px; padding:20px 40px; margin:0 0 24px;
                                 display:inline-block;">
                         <div style="font-family:%s; font-size:11px; font-weight:600;
                                     letter-spacing:0.1em; color:%s; margin-bottom:8px;
@@ -287,8 +374,8 @@ public class emailTemplates {
                         your appointment has been booked successfully.</p>
                 </div>
                 <div style="padding:0 48px 32px;">
-                    <table style="width:100%%; border-collapse:collapse;
-                                  border:1px solid %s; border-radius:8px; overflow:hidden;">
+                    <table style="width:100%%; border-collapse:separate; border-spacing:0;
+                                  border:1px solid %s; border-radius:12px; overflow:hidden;">
                         <thead>
                             <tr style="background:%s;">
                                 <td colspan="2" style="padding:12px 16px; font-family:%s;
@@ -301,7 +388,7 @@ public class emailTemplates {
                         </tbody>
                     </table>
                     <div style="background:%s; border-left:3px solid %s;
-                                border-radius:4px; padding:12px 16px; margin-top:20px;">
+                                border-radius:8px; padding:12px 16px; margin-top:20px;">
                         <p style="font-family:%s; font-size:12px; color:%s; margin:0;
                                    line-height:1.7;">
                             Please arrive 15 minutes early &nbsp;&middot;&nbsp;
@@ -318,7 +405,7 @@ public class emailTemplates {
                 GRAY_200,
                 TEAL_FAINT, BASE_FONT, TEAL_DARK,
                 rows,
-                BLUE_LIGHT, BLUE,
+                BLUE_LIGHT, TEAL,
                 BASE_FONT, GRAY_700,
                 divider()
         ) + footer() + WRAPPER_CLOSE;
@@ -351,7 +438,7 @@ public class emailTemplates {
                         is scheduled in <strong style="color:%s;">1 hour</strong>.</p>
 
                     <div style="background:%s; border:2px solid %s;
-                                border-radius:10px; padding:18px 36px; margin:0 0 20px;
+                                border-radius:14px; padding:18px 36px; margin:0 0 20px;
                                 display:inline-block;">
                         <div style="font-family:%s; font-size:11px; font-weight:600;
                                     letter-spacing:0.08em; color:%s; margin-bottom:6px;
@@ -396,9 +483,9 @@ public class emailTemplates {
 
         return wrapperOpen() + header() + accentLine() + """
                 <div style="padding:40px 48px 32px; text-align:center;">
-                    <div style="width:64px; height:64px; border-radius:50%%; background:%s;
+                    <div style="width:68px; height:68px; border-radius:50%%; background:%s;
                                 margin:0 auto 20px; display:flex; align-items:center;
-                                justify-content:center; line-height:64px; text-align:center;">
+                                justify-content:center; line-height:68px; text-align:center;">
                         <svg width="30" height="30" viewBox="0 0 30 30"
                              xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;">
                             %s
@@ -407,7 +494,7 @@ public class emailTemplates {
                     <div style="display:inline-block; background:%s; color:%s;
                                 font-family:%s; font-size:11px; font-weight:600;
                                 letter-spacing:0.06em; text-transform:uppercase;
-                                padding:4px 12px; border-radius:20px; margin-bottom:14px;">Cancellation Notice</div>
+                                padding:5px 14px; border-radius:999px; margin-bottom:14px;">Cancellation Notice</div>
                     <div style="font-family:%s; font-size:26px; font-weight:700;
                                 color:%s; letter-spacing:-0.02em; margin-bottom:10px;">
                         Appointment Cancelled</div>
@@ -453,9 +540,9 @@ public class emailTemplates {
 
         return wrapperOpen() + header() + accentLine() + """
                 <div style="padding:40px 48px 32px; text-align:center;">
-                    <div style="width:64px; height:64px; border-radius:50%%; background:%s;
+                    <div style="width:68px; height:68px; border-radius:50%%; background:%s;
                                 margin:0 auto 20px; display:flex; align-items:center;
-                                justify-content:center; line-height:64px; text-align:center;">
+                                justify-content:center; line-height:68px; text-align:center;">
                         <svg width="30" height="30" viewBox="0 0 30 30"
                              xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;">
                             %s
@@ -464,7 +551,7 @@ public class emailTemplates {
                     <div style="display:inline-block; background:%s; color:%s;
                                 font-family:%s; font-size:11px; font-weight:600;
                                 letter-spacing:0.06em; text-transform:uppercase;
-                                padding:4px 12px; border-radius:20px; margin-bottom:14px;">Schedule Updated</div>
+                                padding:5px 14px; border-radius:999px; margin-bottom:14px;">Schedule Updated</div>
                     <div style="font-family:%s; font-size:26px; font-weight:700;
                                 color:%s; letter-spacing:-0.02em; margin-bottom:10px;">
                         Appointment Rescheduled</div>
@@ -476,7 +563,7 @@ public class emailTemplates {
                         has been rescheduled to a new date and time.</p>
 
                     <div style="background:%s; border:2px solid %s;
-                                border-radius:10px; padding:18px 36px; margin:0 0 20px;
+                                border-radius:14px; padding:18px 36px; margin:0 0 20px;
                                 display:inline-block;">
                         <div style="font-family:%s; font-size:11px; font-weight:600;
                                     letter-spacing:0.08em; color:%s; margin-bottom:6px;
@@ -538,8 +625,8 @@ public class emailTemplates {
                         <strong style="color:%s;">Clinic Management System</strong>.</p>
                 </div>
                 <div style="padding:0 48px 32px;">
-                    <table style="width:100%%; border-collapse:collapse;
-                                  border:1px solid %s; border-radius:8px;
+                    <table style="width:100%%; border-collapse:separate; border-spacing:0;
+                                  border:1px solid %s; border-radius:12px;
                                   overflow:hidden; margin-bottom:24px;">
                         <thead>
                             <tr style="background:%s;">
@@ -562,7 +649,7 @@ public class emailTemplates {
                         %s
                     </div>
                     <div style="background:%s; border-left:3px solid %s;
-                                border-radius:4px; padding:12px 16px;">
+                                border-radius:8px; padding:12px 16px;">
                         <p style="font-family:%s; font-size:12px; color:%s; margin:0;
                                    line-height:1.7;">
                             For security, please change your password immediately after first login.<br>
@@ -582,7 +669,7 @@ public class emailTemplates {
                 BASE_FONT, GRAY_700,
                 ctaButton(verificationUrl, "Verify Email", TEAL, WHITE),
                 ctaButton(resetPasswordUrl, "Reset Password", WHITE, TEAL_DARK),
-                BLUE_LIGHT, BLUE,
+                BLUE_LIGHT, TEAL,
                 BASE_FONT, GRAY_700,
                 divider()
         ) + footer() + WRAPPER_CLOSE;
@@ -610,8 +697,8 @@ public class emailTemplates {
                         <strong style="color:%s;">Clinic Management System</strong>.</p>
                 </div>
                 <div style="padding:0 48px 32px;">
-                    <table style="width:100%%; border-collapse:collapse;
-                                  border:1px solid %s; border-radius:8px;
+                    <table style="width:100%%; border-collapse:separate; border-spacing:0;
+                                  border:1px solid %s; border-radius:12px;
                                   overflow:hidden; margin-bottom:24px;">
                         <thead>
                             <tr style="background:%s;">
